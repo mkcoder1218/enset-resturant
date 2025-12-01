@@ -2,14 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Send, X, Bot, Loader2, Sparkles } from 'lucide-react';
 import { getGeminiResponse } from '../services/geminiService';
 import { ChatMessage } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { t, language } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
       role: 'model',
-      text: 'Salam! Welcome to Enset. How can I help you navigate our menu or traditions today?',
+      text: language === 'en' 
+        ? 'Salam! Welcome to Enset. How can I help you navigate our menu or traditions today?'
+        : 'ሰላም! እንኳን ወደ እንሰት በደህና መጡ። ስለ ምግቦቻችን ወይም ባህላችን ምን ልርዳዎ?',
       timestamp: new Date()
     }
   ]);
@@ -25,6 +29,22 @@ const ChatWidget: React.FC = () => {
     if (isOpen) scrollToBottom();
   }, [messages, isOpen]);
 
+  // Update welcome message when language changes
+  useEffect(() => {
+    setMessages(prev => {
+      const newMessages = [...prev];
+      if (newMessages.length > 0 && newMessages[0].id === 'welcome') {
+        newMessages[0] = {
+          ...newMessages[0],
+          text: language === 'en' 
+            ? 'Salam! Welcome to Enset. How can I help you navigate our menu or traditions today?'
+            : 'ሰላም! እንኳን ወደ እንሰት በደህና መጡ። ስለ ምግቦቻችን ወይም ባህላችን ምን ልርዳዎ?'
+        };
+      }
+      return newMessages;
+    });
+  }, [language]);
+
   const handleSend = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -39,17 +59,31 @@ const ChatWidget: React.FC = () => {
     setInputValue('');
     setIsLoading(true);
 
-    const replyText = await getGeminiResponse(inputValue);
+    try {
+      const replyText = await getGeminiResponse(inputValue);
 
-    const botMsg: ChatMessage = {
-      id: (Date.now() + 1).toString(),
-      role: 'model',
-      text: replyText,
-      timestamp: new Date()
-    };
+      const botMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'model',
+        text: replyText,
+        timestamp: new Date()
+      };
 
-    setMessages(prev => [...prev, botMsg]);
-    setIsLoading(false);
+      setMessages(prev => [...prev, botMsg]);
+    } catch (error) {
+      console.error("Error getting response:", error);
+      const errorMsg: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'model',
+        text: language === 'en' 
+          ? "I apologize, but I'm having trouble connecting right now. Please try again later."
+          : "ይቅርታ፣ አሁን መገናኘት አልቻልኩም። እባክዎ ትንሽ ቆይተው እንደገና ይሞክሩ።",
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -70,7 +104,7 @@ const ChatWidget: React.FC = () => {
                 <Sparkles size={16} className="text-enset-gold" />
               </div>
               <div>
-                <h3 className="font-bold text-sm">Enset Assistant</h3>
+                <h3 className="font-bold text-sm">{t.chat.title}</h3>
                 <p className="text-xs text-green-200">Powered by Gemini AI</p>
               </div>
             </div>
@@ -104,7 +138,7 @@ const ChatWidget: React.FC = () => {
               <div className="flex justify-start">
                 <div className="bg-white rounded-2xl rounded-bl-none px-4 py-3 border border-gray-100 shadow-sm flex items-center space-x-2">
                   <Loader2 className="animate-spin text-enset-green" size={16} />
-                  <span className="text-xs text-gray-500">Thinking...</span>
+                  <span className="text-xs text-gray-500">{language === 'en' ? "Thinking..." : "በማሰብ ላይ..."}</span>
                 </div>
               </div>
             )}
@@ -116,7 +150,7 @@ const ChatWidget: React.FC = () => {
             <div className="flex items-center space-x-2 bg-gray-100 rounded-full px-4 py-2 border border-transparent focus-within:border-enset-green focus-within:bg-white transition-all">
               <input
                 type="text"
-                placeholder="Ask about dishes..."
+                placeholder={t.chat.placeholder}
                 className="flex-1 bg-transparent border-none outline-none text-sm text-gray-800 placeholder-gray-400"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}

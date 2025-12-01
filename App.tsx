@@ -27,7 +27,7 @@ const App: React.FC = () => {
   return (
     <Layout currentView={currentView} onChangeView={setCurrentView}>
       {renderView()}
-      <ChatWidget />
+      {/* <ChatWidget /> */}
     </Layout>
   );
 };
