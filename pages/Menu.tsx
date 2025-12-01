@@ -2,15 +2,28 @@ import React, { useState } from 'react';
 import { MENU_ITEMS } from '../constants';
 import DishCard from '../components/DishCard';
 import { DishCategory } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const CATEGORIES: DishCategory[] = ['Meat', 'Vegetarian', 'Breakfast', 'Drinks'];
 
 const Menu: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<DishCategory | 'All'>('All');
+  const { t, language } = useLanguage();
 
   const filteredItems = activeCategory === 'All' 
     ? MENU_ITEMS 
     : MENU_ITEMS.filter(item => item.category === activeCategory);
+
+  const getCategoryLabel = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'all': return t.menu.categories.all;
+      case 'meat': return t.menu.categories.meat;
+      case 'vegetarian': return t.menu.categories.vegetarian;
+      case 'breakfast': return t.menu.categories.breakfast;
+      case 'drinks': return t.menu.categories.drinks;
+      default: return category;
+    }
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen py-12 animate-in fade-in duration-500">
@@ -18,10 +31,11 @@ const Menu: React.FC = () => {
         
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-enset-green mb-4">Our Menu</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-enset-green mb-4">{t.menu.title}</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Discover the vibrant tastes of Ethiopia. All our dishes are served with Injera, 
-            our traditional sourdough flatbread made from Teff flour.
+            {language === 'en' 
+              ? "Discover the vibrant tastes of Ethiopia. All our dishes are served with Injera, our traditional sourdough flatbread made from Teff flour."
+              : "የኢትዮጵያን ደማቅ ጣዕም ያግኙ። ሁሉም ምግቦቻችን ከጤፍ በተሰራ እንጀራ ጋር ይቀርባሉ።"}
           </p>
         </div>
 
@@ -35,7 +49,7 @@ const Menu: React.FC = () => {
                 : 'bg-white text-gray-600 hover:bg-gray-100'
             }`}
           >
-            All Items
+            {t.menu.categories.all}
           </button>
           {CATEGORIES.map(category => (
             <button
@@ -47,7 +61,7 @@ const Menu: React.FC = () => {
                   : 'bg-white text-gray-600 hover:bg-gray-100'
               }`}
             >
-              {category}
+              {getCategoryLabel(category)}
             </button>
           ))}
         </div>
@@ -61,11 +75,11 @@ const Menu: React.FC = () => {
 
         {/* Footer Note */}
         <div className="mt-16 text-center bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-          <h3 className="text-xl font-bold text-enset-green mb-2">Dietary Information</h3>
+          <h3 className="text-xl font-bold text-enset-green mb-2">{language === 'en' ? 'Dietary Information' : 'የአመጋገብ መረጃ'}</h3>
           <p className="text-gray-600 text-sm">
-            Our Injera is naturally gluten-free (ask for pure Teff). 
-            We use separate cookware for vegetarian dishes to ensure they are 100% vegan friendly (Fasting food).
-            Please inform your server of any allergies.
+            {language === 'en'
+              ? "Our Injera is naturally gluten-free (ask for pure Teff). We use separate cookware for vegetarian dishes to ensure they are 100% vegan friendly (Fasting food). Please inform your server of any allergies."
+              : "እንጀራችን በተፈጥሮ ከግሉተን ነፃ ነው (ንጹህ ጤፍ ይጠይቁ)። ለጾም ምግቦች የተለየ ማብሰያ እንጠቀማለን። እባክዎ ማንኛውም አለርጂ ካለዎት ለአስተናጋጅዎ ያሳውቁ።"}
           </p>
         </div>
       </div>

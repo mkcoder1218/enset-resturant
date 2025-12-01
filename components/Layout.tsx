@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Menu, X, Instagram, Facebook, Twitter, MapPin, Phone, Mail } from 'lucide-react';
+import { Menu, X, Instagram, Facebook, Twitter, MapPin, Phone, Mail, Globe } from 'lucide-react';
 import { ViewState } from '../types';
 import { NAV_LINKS } from '../constants';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface LayoutProps {
   currentView: ViewState;
@@ -11,9 +12,24 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { t, language, setLanguage } = useLanguage();
 
   const handleNavClick = (view: ViewState) => {
     onChangeView(view);
+    setIsMobileMenuOpen(false);
+  };
+
+  const getNavLinkLabel = (value: string) => {
+    switch (value) {
+      case 'HOME': return t.nav.home;
+      case 'MENU': return t.nav.menu;
+      case 'CONTACT': return t.nav.contact;
+      default: return value;
+    }
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'am' : 'en');
     setIsMobileMenuOpen(false);
   };
 
@@ -39,7 +55,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
             </div>
 
             {/* Desktop Menu */}
-            <div className="hidden md:flex space-x-8">
+            <div className="hidden md:flex space-x-8 items-center">
               {NAV_LINKS.map((link) => (
                 <button
                   key={link.value}
@@ -50,19 +66,35 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
                       : 'text-gray-600 hover:text-enset-green'
                   }`}
                 >
-                  {link.label}
+                  {getNavLinkLabel(link.value)}
                 </button>
               ))}
+              
+              <button 
+                onClick={toggleLanguage}
+                className="flex items-center space-x-1 text-gray-600 hover:text-enset-green transition-colors font-medium"
+              >
+                <Globe size={18} />
+                <span>{language === 'en' ? 'AM' : 'EN'}</span>
+              </button>
+
               <button 
                 onClick={() => handleNavClick('CONTACT')}
                 className="bg-enset-green text-white px-5 py-2 rounded-md font-medium text-sm hover:bg-green-900 transition-colors shadow-lg shadow-green-900/20"
               >
-                Book a Table
+                {t.home.bookTable}
               </button>
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="md:hidden">
+            <div className="md:hidden flex items-center space-x-4">
+              <button 
+                onClick={toggleLanguage}
+                className="text-gray-600 hover:text-enset-green transition-colors font-medium flex items-center space-x-1"
+              >
+                <Globe size={20} />
+                <span>{language === 'en' ? 'AM' : 'EN'}</span>
+              </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-enset-green hover:text-enset-red transition-colors"
@@ -87,7 +119,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
                       : 'text-gray-700 hover:bg-gray-50 hover:text-enset-green'
                   }`}
                 >
-                  {link.label}
+                  {getNavLinkLabel(link.value)}
                 </button>
               ))}
               <div className="pt-4 mt-4 border-t border-gray-100">
@@ -95,7 +127,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
                   onClick={() => handleNavClick('CONTACT')}
                   className="w-full bg-enset-red text-white px-4 py-3 rounded-md font-bold shadow-md active:scale-95 transition-transform"
                 >
-                  Book a Table
+                  {t.home.bookTable}
                 </button>
               </div>
             </div>
@@ -117,8 +149,9 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
             <div>
               <h3 className="text-2xl font-serif font-bold text-enset-gold mb-4">Enset Restaurant</h3>
               <p className="text-gray-300 leading-relaxed mb-6">
-                Authentic Ethiopian flavors in the heart of the city. 
-                Experience the tradition of gursha and the warmth of our hospitality.
+                {language === 'en' 
+                  ? "Authentic Ethiopian flavors in the heart of the city. Experience the tradition of gursha and the warmth of our hospitality."
+                  : "በከተማው መሃል ትክክለኛ የኢትዮጵያ ጣዕም። የጉርሻ ባህልን እና የእንግዳ ተቀባይነታችንን ሙቀት ይለማመዱ።"}
               </p>
               <div className="flex space-x-4">
                 <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-enset-gold hover:text-enset-green transition-all">
@@ -135,7 +168,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
 
             {/* Contact Info */}
             <div>
-              <h4 className="text-lg font-bold mb-6 text-enset-gold">Contact Us</h4>
+              <h4 className="text-lg font-bold mb-6 text-enset-gold">{t.contact.title}</h4>
               <ul className="space-y-4">
                 <li className="flex items-start">
                   <MapPin className="mr-3 text-enset-gold flex-shrink-0" size={20} />
@@ -154,7 +187,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
 
             {/* Hours */}
             <div>
-              <h4 className="text-lg font-bold mb-6 text-enset-gold">Opening Hours</h4>
+              <h4 className="text-lg font-bold mb-6 text-enset-gold">{t.contact.hours}</h4>
               <ul className="space-y-2 text-gray-300">
                 <li className="flex justify-between border-b border-white/10 pb-2">
                   <span>Mon - Thu</span>

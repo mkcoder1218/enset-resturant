@@ -3,7 +3,9 @@ export type DishCategory = 'Meat' | 'Vegetarian' | 'Breakfast' | 'Drinks';
 export interface Dish {
   id: string;
   name: string;
+  nameAm?: string;
   description: string;
+  descriptionAm?: string;
   price: number;
   category: DishCategory;
   imageUrl: string;

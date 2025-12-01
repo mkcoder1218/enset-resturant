@@ -3,6 +3,7 @@ import { MENU_ITEMS } from '../constants';
 import DishCard from '../components/DishCard';
 import { ViewState } from '../types';
 import { ArrowRight, Star, UtensilsCrossed } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface HomeProps {
   onChangeView: (view: ViewState) => void;
@@ -10,6 +11,7 @@ interface HomeProps {
 
 const Home: React.FC<HomeProps> = ({ onChangeView }) => {
   const featuredDishes = MENU_ITEMS.slice(0, 3);
+  const { t, language } = useLanguage();
 
   return (
     <div className="animate-in fade-in duration-500">
@@ -18,35 +20,42 @@ const Home: React.FC<HomeProps> = ({ onChangeView }) => {
       <section className="relative h-[80vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://picsum.photos/seed/ethiopianfood/1920/1080" 
+            src="/unnamed.webp" 
             alt="Ethiopian Feast" 
+            crossOrigin="anonymous"
             className="w-full h-full object-cover"
+            
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent"></div>
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-2xl">
-            <span className="text-enset-gold font-bold tracking-wider uppercase mb-4 block animate-in slide-in-from-left-10 duration-700 delay-100">Welcome to Enset</span>
+            <span className="text-enset-gold font-bold tracking-wider uppercase mb-4 block animate-in slide-in-from-left-10 duration-700 delay-100">{t.home.welcome}</span>
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight animate-in slide-in-from-left-10 duration-700 delay-200">
-              Taste the Soul <br/> of <span className="text-enset-gold">Ethiopia</span>
+              {language === 'en' ? (
+                <>Taste the Soul <br/> of <span className="text-enset-gold">Ethiopia</span></>
+              ) : (
+                <><span className="text-enset-gold">የኢትዮጵያን</span> <br/> ጣዕም ይለማመዱ</>
+              )}
             </h1>
             <p className="text-lg text-gray-200 mb-8 leading-relaxed animate-in slide-in-from-left-10 duration-700 delay-300">
-              Experience authentic flavors, traditional communal dining, and the warmth of East African hospitality. 
-              Join us for a journey of spice and culture.
+              {language === 'en' 
+                ? "Experience authentic flavors, traditional communal dining, and the warmth of East African hospitality. Join us for a journey of spice and culture."
+                : "ትክክለኛ ጣዕሞችን፣ ባህላዊ የጋራ መመገብን እና የምስራቅ አፍሪካን እንግዳ ተቀባይነት ይለማመዱ። ለቅመም እና ለባህል ጉዞ ይቀላቀሉን።"}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 animate-in slide-in-from-left-10 duration-700 delay-400">
               <button 
                 onClick={() => onChangeView('MENU')}
                 className="bg-enset-gold text-enset-green px-8 py-3 rounded-md font-bold text-lg hover:bg-yellow-400 transition-colors shadow-lg flex items-center justify-center"
               >
-                View Menu <ArrowRight className="ml-2" size={20} />
+                {t.home.exploreMenu} <ArrowRight className="ml-2" size={20} />
               </button>
               <button 
                 onClick={() => onChangeView('CONTACT')}
                 className="border-2 border-white text-white px-8 py-3 rounded-md font-bold text-lg hover:bg-white hover:text-enset-green transition-colors flex items-center justify-center"
               >
-                Book a Table
+                {t.home.bookTable}
               </button>
             </div>
           </div>
@@ -60,7 +69,7 @@ const Home: React.FC<HomeProps> = ({ onChangeView }) => {
             <div className="relative">
               <div className="absolute -top-4 -left-4 w-24 h-24 border-t-4 border-l-4 border-enset-gold"></div>
               <img 
-                src="https://picsum.photos/seed/restaurant/600/700" 
+                src="https://lh3.googleusercontent.com/gps-cs-s/AG0ilSwL-UcUo8ELOw4dM0ytaf5SB6QTLGNPYmvRyh9bF4cb_KHE3eDQxpLWXVDHHRZibAtn5D5vwWZShIij4INNZGYKDQGt0CIIyQpTosFYXSnJM9bhpDLM3s__omV_rytoPUFw_gue-w=s1360-w1360-h1020-rw" 
                 alt="Restaurant Interior" 
                 className="rounded-lg shadow-2xl relative z-10 w-full"
               />
@@ -99,7 +108,7 @@ const Home: React.FC<HomeProps> = ({ onChangeView }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-enset-red font-bold uppercase tracking-wider text-sm">Chef's Selection</span>
-            <h2 className="text-4xl font-serif font-bold text-enset-green mt-2">Featured Dishes</h2>
+            <h2 className="text-4xl font-serif font-bold text-enset-green mt-2">{language === 'en' ? 'Featured Dishes' : 'ልዩ ምግቦች'}</h2>
             <div className="w-24 h-1 bg-enset-gold mx-auto mt-4"></div>
           </div>
           
@@ -114,7 +123,7 @@ const Home: React.FC<HomeProps> = ({ onChangeView }) => {
               onClick={() => onChangeView('MENU')}
               className="inline-flex items-center text-enset-green font-bold text-lg hover:text-enset-red transition-colors"
             >
-              Explore Full Menu <ArrowRight className="ml-2" size={20} />
+              {t.home.exploreMenu} <ArrowRight className="ml-2" size={20} />
             </button>
           </div>
         </div>
